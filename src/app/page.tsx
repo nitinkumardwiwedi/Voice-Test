@@ -1,7 +1,10 @@
-import Image from "next/image";
+"use client"
 import Script from "next/script";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <iframe
@@ -19,6 +22,7 @@ export default function Home() {
         }}
         title="Exei SDK"
       ></iframe>
+      <button onClick={()=>router.push("/voiceTest")} className="bg-blue-500 text-white py-2 px-4 rounded cursor-pointer">Go to voice Test</button>
       <div>
         Lorem ipsum dolor sit, amet consectetur adipisicing elit. Magnam,
         eveniet! Quas ratione id cupiditate optio voluptatem natus dolore
