@@ -42,7 +42,7 @@ export default function Page() {
   const startSocket = async () => {
     if (connected) return;
 
-    const socket = io("http://localhost:5000", {
+    const socket = io("https://qa-api.exei.ai", {
       transports: ["websocket"],
     });
 
@@ -100,7 +100,7 @@ export default function Page() {
 
       socketRef.current.emit("stt", {
         int16Buffer: int16.buffer,
-        CLIENTID: "2d6e62e2-f555-40af-9771-acf94d47a855",
+        CLIENTID: "8b619599-5f69-4429-b0a2-cd3ad6d5a544",
         sessionId: "bdb7806d-5e54-48a8-81b5-d320dbc54a7e/user/",
       });
     };

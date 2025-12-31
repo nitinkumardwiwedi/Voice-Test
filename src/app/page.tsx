@@ -7,7 +7,7 @@ export default function Home() {
 
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <iframe
+      {/* <iframe
         id="myIframe"
         allow="microphone"
         src="http://localhost:3000/sdk/694a3b842a7f8b459feff93f?mic=true&channelType=WEBSITE&API_KEY=3edcc867413d487b9a478200a21a3b18"
@@ -21,7 +21,7 @@ export default function Home() {
           zIndex: 9999,
         }}
         title="Exei SDK"
-      ></iframe>
+      ></iframe> */}
       <button onClick={()=>router.push("/voiceTest")} className="bg-blue-500 text-white py-2 px-4 rounded cursor-pointer">Go to voice Test</button>
       <div>
         Lorem ipsum dolor sit, amet consectetur adipisicing elit. Magnam,
