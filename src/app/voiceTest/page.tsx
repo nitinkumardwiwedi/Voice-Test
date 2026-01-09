@@ -8,7 +8,8 @@ export default function Page() {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const sessionId = uuid();
+  const sessionIdRef = useRef(uuid());
+  const sessionId = sessionIdRef.current;
 
   const [connected, setConnected] = useState(false);
   const [micOn, setMicOn] = useState(false);
@@ -48,11 +49,10 @@ export default function Page() {
       currentAudioRef.current = null;
     });
   };
-
   const startSocket = async () => {
     if (connected) return;
 
-    const socket = io("https://qa-api.exei.ai", {
+    const socket = io("https://qa-api.exei.ai/", {
       transports: ["websocket"],
     });
 
@@ -62,10 +62,11 @@ export default function Page() {
       const payload = {
         session_id: sessionId,
         id: socketRef?.current?.id,
-        clientId: "8b619599-5f69-4429-b0a2-cd3ad6d5a544",
+        clientId: "6427e365-c4a9-4633-96a4-00a13763ea3a",
         hasVoiceChatStarted: "FALSE",
-        // source: SocketConnectionSourceEnum.SDK,
+        // source: "SDK",
       };
+      console.log(payload);
       socketRef.current?.emit("addSession", payload);
       setConnected(true);
       await startMic();
@@ -140,7 +141,7 @@ export default function Page() {
 
       socketRef.current.emit("stt", {
         int16Buffer: int16.buffer,
-        CLIENTID: "2d6e62e2-f555-40af-9771-acf94d47a855",
+        CLIENTID: "6427e365-c4a9-4633-96a4-00a13763ea3a",
         sessionId: sessionId,
       });
     };
