@@ -1,18 +1,22 @@
 "use client";
-
-import { io, Socket } from "socket.io-client";
 import { useRef, useState } from "react";
+import { io, Socket } from "socket.io-client";
+import { v4 as uuid } from "uuid";
 
 export default function Page() {
   const socketRef = useRef<Socket | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const sessionId = uuid();
 
   const [connected, setConnected] = useState(false);
   const [micOn, setMicOn] = useState(false);
   const audioQueueRef = useRef<string[]>([]);
   const isPlayingRef = useRef(false);
+
+  // Correctly type currentAudioRef to hold an instance of HTMLAudioElement (not the constructor)
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null); // Updated type
 
   const playNextAudio = () => {
     if (isPlayingRef.current) return;
@@ -23,19 +27,25 @@ export default function Page() {
     const audioUrl = audioQueueRef.current.shift()!;
     const audio = new Audio(audioUrl);
 
+    // Track the current playing audio
+    currentAudioRef.current = audio;
+
     audio.onended = () => {
       URL.revokeObjectURL(audioUrl);
       isPlayingRef.current = false;
-      playNextAudio(); // play next in queue
+      currentAudioRef.current = null;
+      playNextAudio(); // Play next in queue
     };
 
     audio.onerror = () => {
       isPlayingRef.current = false;
+      currentAudioRef.current = null;
       playNextAudio();
     };
 
     audio.play().catch(() => {
       isPlayingRef.current = false;
+      currentAudioRef.current = null;
     });
   };
 
@@ -49,13 +59,21 @@ export default function Page() {
     socketRef.current = socket;
 
     socket.on("connect", async () => {
+      const payload = {
+        session_id: sessionId,
+        id: socketRef?.current?.id,
+        clientId: "8b619599-5f69-4429-b0a2-cd3ad6d5a544",
+        hasVoiceChatStarted: "FALSE",
+        // source: SocketConnectionSourceEnum.SDK,
+      };
+      socketRef.current?.emit("addSession", payload);
       setConnected(true);
       await startMic();
     });
 
     socket.on("audio-data", (body) => {
+      console.log("Received audio data:", body);
       const base64Audio = body.data;
-
       const byteCharacters = atob(base64Audio);
       const byteNumbers = new Array(byteCharacters.length);
 
@@ -69,6 +87,28 @@ export default function Page() {
 
       audioQueueRef.current.push(audioUrl);
       playNextAudio();
+    });
+
+    socket.on("transcript", (body) => {
+      if (body && body.interrupt) {
+        console.log("Interrupt detected:", body.interrupt);
+
+        // Stop the current audio if it's playing
+        if (currentAudioRef.current) {
+          currentAudioRef.current.pause();
+          currentAudioRef.current.currentTime = 0;
+          isPlayingRef.current = false;
+          currentAudioRef.current = null;
+        }
+
+        // Clear the queue and add interrupt audio
+        audioQueueRef.current.length = 0;
+        const interruptAudioUrl = body.newAudioUrl; // Assuming interrupt audio URL is provided
+        audioQueueRef.current.push(interruptAudioUrl);
+
+        // Play the interrupt audio immediately
+        playNextAudio();
+      }
     });
 
     socket.on("disconnect", () => {
@@ -100,8 +140,8 @@ export default function Page() {
 
       socketRef.current.emit("stt", {
         int16Buffer: int16.buffer,
-        CLIENTID: "8b619599-5f69-4429-b0a2-cd3ad6d5a544",
-        sessionId: "bdb7806d-5e54-48a8-81b5-d320dbc54a7e/user/",
+        CLIENTID: "2d6e62e2-f555-40af-9771-acf94d47a855",
+        sessionId: sessionId,
       });
     };
 
@@ -183,6 +223,7 @@ export default function Page() {
   );
 }
 
+// Status Component
 function Status({ label, active }: { label: string; active: boolean }) {
   return (
     <div className="flex items-center justify-between bg-slate-800 px-4 py-2 rounded-lg">
