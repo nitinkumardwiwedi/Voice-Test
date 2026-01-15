@@ -62,7 +62,7 @@ export default function Page() {
       const payload = {
         session_id: sessionId,
         id: socketRef?.current?.id,
-        clientId: "6427e365-c4a9-4633-96a4-00a13763ea3a",
+        clientId: "0b70b0de-5aba-4df1-b87c-6f073ffda251",
         hasVoiceChatStarted: "FALSE",
         // source: "SDK",
       };
@@ -139,9 +139,9 @@ export default function Page() {
         int16[i] = Math.max(-1, Math.min(1, input[i])) * 32767;
       }
 
-      socketRef.current.emit("stt", {
-        int16Buffer: int16.buffer,
-        CLIENTID: "6427e365-c4a9-4633-96a4-00a13763ea3a",
+      socketRef.current.emit("audio-listener", {
+        AudioBuffer: int16.buffer,
+        CLIENTID: "0b70b0de-5aba-4df1-b87c-6f073ffda251",
         sessionId: sessionId,
       });
     };
