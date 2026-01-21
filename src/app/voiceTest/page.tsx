@@ -52,7 +52,7 @@ export default function Page() {
   const startSocket = async () => {
     if (connected) return;
 
-    const socket = io("https://qa-api.exei.ai/", {
+    const socket = io("https://staging-api.exei.ai/", {
       transports: ["websocket"],
     });
 
@@ -62,7 +62,7 @@ export default function Page() {
       const payload = {
         session_id: sessionId,
         id: socketRef?.current?.id,
-        clientId: "0b70b0de-5aba-4df1-b87c-6f073ffda251",
+        clientId: "022d7efd-081e-42a9-844e-cf9991a97572",
         hasVoiceChatStarted: "FALSE",
         // source: "SDK",
       };
@@ -141,7 +141,7 @@ export default function Page() {
 
       socketRef.current.emit("audio-listener", {
         AudioBuffer: int16.buffer,
-        CLIENTID: "0b70b0de-5aba-4df1-b87c-6f073ffda251",
+        CLIENTID: "022d7efd-081e-42a9-844e-cf9991a97572",
         sessionId: sessionId,
       });
     };
